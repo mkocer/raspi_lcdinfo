@@ -38,6 +38,7 @@
 
 #include "lcd.h"
 #include "w1therm.h"
+#include "kaws_curl.h"
 
 #define SECS_IN_DAY 86400
 #define SECS_IN_HOUR 3600
@@ -45,10 +46,19 @@
 
 #define DEG 223
 
+#define TENDENCY_MAX 100
+
+#define KAWS_HOST "10.46.1.131"
+
 typedef char ip_address[15+1];
 struct lcdmodule module;
+double temperature = 0.0;
+double tendency[TENDENCY_MAX]; 
+int    tendI = 0;
+struct KAWSstruct kaws;
 
 static int get_addr(char * ifname,ip_address theip);
+signed char press_tendency(double *measurements);
 void updateDisplay (struct lcdmodule module, unsigned int displayOption);
 void sigintHandler(void);
 void sigtermHandler(void);
@@ -58,8 +68,8 @@ void sigtermHandler(void);
 
 int main(int argc, char **argv) {
   ip_address	theip;
-  double temperature = 0.0;
   unsigned char i=0;
+  int bonus = 0;
   //struct lcdmodule module2;
 
   // Here we create and initialise two LCD modules.
@@ -87,6 +97,7 @@ int main(int argc, char **argv) {
 
   int displayOption = 0;
   while(1) {
+    bonus = 0;
     gotoXy(module, 0,0);
     prints(module, "                ");
     // TODO: This should be capable of blanking out a line wider than 16 chars.
@@ -100,21 +111,31 @@ int main(int argc, char **argv) {
     } else {
       prints(module, "IP unknown!");
     }
-    for (i=0; i < 5; i++) 
+    if (displayOption == 2) 
+     {
+      kaws = getKAWS(KAWS_HOST);
+      tendency[tendI] = kaws.bp;
+      tendI++;
+      if (tendI >= TENDENCY_MAX) {
+          tendI = 0;
+      }
+      bonus = 10;
+     }
+    for (i=0; i < (5 + bonus); i++) 
     {
      updateDisplay(module, displayOption);
      if ( (displayOption == 1) && (temperature > -1000.0) ) {
        // print temperature instead of IP
        temperature = w1therm(); // read temperature
        if ( temperature > -100.0) {
-        char T[17];
+        char line[17];
 
-        sprintf(T,"%.1lf%cC",temperature,DEG);
+        sprintf(line,"%.1lf%cC",temperature,DEG);
         gotoXy(module, 0,0);
         prints(module, "                ");
         gotoXy(module, 0,0);
         prints(module, "T = ");
-        prints(module, T);
+        prints(module, line);
        } else {
         temperature = 0;
        }
@@ -122,7 +143,7 @@ int main(int argc, char **argv) {
      sleep(1);
     }
     displayOption++;
-    if (displayOption > 3) { displayOption = 0; }
+    if (displayOption > 4) { displayOption = 0; }
   }
   return 0;
 } // main
@@ -175,6 +196,35 @@ void updateDisplay (struct lcdmodule module, unsigned int displayOption) {
             prints(module, displayBuffer);
             break;
         case 2:
+           if (kaws.T > -30.0) {
+           // show KAWS data
+           snprintf(displayBuffer, 16+1, "%5.1lf%cC %4.0lfhPa",temperature, DEG, kaws.bp );
+           gotoXy(module, 0,0);
+           // Clear the top line
+           prints(module, "                ");
+           gotoXy(module, 0,0);
+           prints(module, displayBuffer);
+           snprintf(displayBuffer, 16+1, "%5.1lf%cC %4.0lf%%",kaws.T, DEG, kaws.H );
+           gotoXy(module, 0,1);
+           prints(module, displayBuffer);
+           temperature = w1therm(); // read temperature
+          } else {
+           // Show current time of day
+           timenow = time(0);
+           timestruct = localtime(&timenow);
+           // calendar day
+           snprintf(displayBuffer, 16+1, "date: %02d.%02d.%04d", timestruct->tm_mday, timestruct->tm_mon + 1, timestruct->tm_year + 1900); 
+           gotoXy(module, 0,0);
+           // Clear the top line
+           prints(module, "                ");
+           gotoXy(module, 0,0);
+           prints(module, displayBuffer);
+           snprintf(displayBuffer, 16+1, "time: %02d:%02d:%02d", timestruct->tm_hour, timestruct->tm_min, timestruct->tm_sec);
+           gotoXy(module, 0,1);
+           prints(module, displayBuffer);
+          }
+          break; 
+        case 3:
           // Disk space free on / partition
           if (statfs("/", &diskinfo) == 0) {
             prints(module, "SD / :");
@@ -184,7 +234,7 @@ void updateDisplay (struct lcdmodule module, unsigned int displayOption) {
             prints(module, "Can't stat /!");
           }
           break;
-        case 3:
+        case 4:
           // Show current time of day
           timenow = time(0);
           timestruct = localtime(&timenow);
@@ -253,4 +303,27 @@ void sigtermHandler(void) {
   prints(module, "Shutting down...");
   backLightLED(module, 0);
   exit(0);
+}
+
+signed char press_tendency(double *measurements)
+{
+  int i=0;
+  double suma=0.0, dif=0.0;
+
+  if (tendI < 3) return(0);
+  suma = measurements[0];
+
+  for (i=2; i< tendI; i++)
+  {
+    dif = measurements[i] - measurements[i-1];
+    suma += dif;
+  } 
+
+  if (suma > 0) {
+     return ((signed char) 1);
+  }
+  if (suma < 0) {
+     return ((signed char) -1);
+  }
+  return ((signed char) 0);
 }
