@@ -1,2 +1,9 @@
 Project based on lcdinfo from Phil's blog:
 http://pbambridge.brunelweb.net/blog/?p=64
+
+This is code designed to display rolling info about the state of your
+Raspberry Pi whilst it is running some sort of GNU/Linux OS, such as
+Debian Squeeze, Raspbian, etc. It doesn't rely on any truly esoteric
+libraries that you shouldn't already have installed.
+
+For more read README.org
