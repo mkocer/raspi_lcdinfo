@@ -11,6 +11,7 @@
  *    v1.0.4 - 2012/07/22 (Reverted to inline define for CMDxBITS, fixed system load calculation)
  *    v1.0.5 - 2012/07/23 (Added support for multiple LCD modules)
  *    v1.0.5 - 2012/08/21 (Added support for BackLight LED)
+ *    v1.0.6 - 2012/10/04 (Added support for temperature reading of DS18B20 from GPIO)
  */
 
 
@@ -36,10 +37,13 @@
 #include <signal.h>
 
 #include "lcd.h"
+#include "w1therm.h"
 
 #define SECS_IN_DAY 86400
 #define SECS_IN_HOUR 3600
 #define SECS_IN_MIN 60
+
+#define DEG 223
 
 typedef char ip_address[15+1];
 struct lcdmodule module;
@@ -54,6 +58,7 @@ void sigtermHandler(void);
 
 int main(int argc, char **argv) {
   ip_address	theip;
+  double temperature = 0.0;
   unsigned char i=0;
   //struct lcdmodule module2;
 
@@ -77,6 +82,9 @@ int main(int argc, char **argv) {
   // backlight ON
   backLightLED(module, 1);
 
+  // try to read temperature
+  temperature = w1therm();
+
   int displayOption = 0;
   while(1) {
     gotoXy(module, 0,0);
@@ -95,6 +103,22 @@ int main(int argc, char **argv) {
     for (i=0; i < 5; i++) 
     {
      updateDisplay(module, displayOption);
+     if ( (displayOption == 1) && (temperature > -1000.0) ) {
+       // print temperature instead of IP
+       temperature = w1therm(); // read temperature
+       if ( temperature > -100.0) {
+        char T[17];
+
+        sprintf(T,"%.1lf%cC",temperature,DEG);
+        gotoXy(module, 0,0);
+        prints(module, "                ");
+        gotoXy(module, 0,0);
+        prints(module, "T = ");
+        prints(module, T);
+       } else {
+        temperature = 0;
+       }
+     }
      sleep(1);
     }
     displayOption++;
