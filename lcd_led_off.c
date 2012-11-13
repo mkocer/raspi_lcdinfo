@@ -30,7 +30,7 @@
 #include "lcd.h"
 #include "rpi.h"
 
-#define LED_PIN  18
+#define LED_PIN  0
 
 int main(int argc, char **argv) {
  

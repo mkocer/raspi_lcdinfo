@@ -8,6 +8,8 @@ The display is connected to GPIO -  using "Dom and Gert van Loo" C-code rpi.c/rp
 Project based on lcdinfo from Phil's blog:
 http://pbambridge.brunelweb.net/blog/?p=64
 the scheme Pi_LCD2_bb.png is taken from that blog.
+But we use other pins for connecting the display,
+see the function lcdInit() in main.c.
 
 Using Occidentalis - Adafruit Educational Linux Distro:
 http://learn.adafruit.com/adafruit-raspberry-pi-educational-linux-distro/
