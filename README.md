@@ -1,5 +1,6 @@
  Prints some information of Raspberry Pi on LCD display
  ======================================================
+
 ( LCD display is supposed to be Hitachi HD44780 compatiple )
 
 The display is connected to GPIO -  using "Dom and Gert van Loo" C-code rpi.c/rpi.h
