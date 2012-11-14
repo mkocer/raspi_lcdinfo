@@ -11,8 +11,13 @@ Original Project
 ----------------
 
 Project based on lcdinfo from Phil's blog: http://pbambridge.brunelweb.net/blog/?p=64
-The scheme picture Pi_LCD2_bb.png is copied from that blog.  But we use other pins 
-for connecting the display, see the function *lcdInit()* in *main.c*.
+
+Scheme
+------
+
+See the scheme picture in scheme directory.
+For right connection of the display, see also the function *lcdInit()* in *main.c*, 
+which specifies which pins are used for which kind of LCD signal. 
 
 Raspberry Pi distro used
 ------------------------
