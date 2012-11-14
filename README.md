@@ -1,17 +1,23 @@
- Prints some information of Raspberry Pi on LCD display
- ======================================================
+Prints some information of Raspberry Pi on LCD display
+======================================================
 
-( LCD display is supposed to be Hitachi HD44780 compatiple )
+LCD display
+-----------
+*LCD display is supposed to be Hitachi HD44780 compatiple*
 
 The display is connected to GPIO -  using "Dom and Gert van Loo" C-code rpi.c/rpi.h
 
-Project based on lcdinfo from Phil's blog:
-http://pbambridge.brunelweb.net/blog/?p=64
-the scheme Pi_LCD2_bb.png is taken from that blog.
-But we use other pins for connecting the display,
-see the function lcdInit() in main.c.
+Original Project
+----------------
 
-Using Occidentalis - Adafruit Educational Linux Distro:
+Project based on lcdinfo from Phil's blog: http://pbambridge.brunelweb.net/blog/?p=64
+The scheme picture Pi_LCD2_bb.png is copied from that blog.  But we use other pins 
+for connecting the display, see the function *lcdInit()* in *main.c*.
+
+Raspberry Pi distro used
+------------------------
+
+We are using Occidentalis - _Adafruit Educational Linux Distro_:
 http://learn.adafruit.com/adafruit-raspberry-pi-educational-linux-distro/
 with "One wire support on GPIO #4 when loaded"
 https://github.com/FrankBuss/linux-1/commit/71871509238d3e7bce4a74cdf616c3f12542acaa
