@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
   // moje funkcni
   //module = lcdInit(8, 0, 23, 24, 25, 4, 18);
   // nove pro adafruit
-  module = lcdInit(17, 18, 21, 22, 23, 24, 0);
+  module = lcdInit(17, 18, 25, 22, 23, 24, 0);
   //module2 = lcdInit(21, 18, 22, 23, 24, 25);
 
   //prints(module2, "Ti goes with Pi.");
