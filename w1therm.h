@@ -17,7 +17,7 @@
 #include <math.h>
 #include <errno.h>
 
-#define W1_SLAVESFILE "/sys/bus/w1/devices/w1 bus master/w1_master_slaves"
+#define W1_SLAVESFILE "/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves"
 #define W1_DEVICEBASE "/sys/bus/w1/devices/"
 #define W1_TEMPFILE   "/w1_slave"
 
