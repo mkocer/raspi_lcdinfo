@@ -97,6 +97,11 @@ int main(int argc, char **argv) {
          prints(module, "IP:");
       }
       prints(module, theip);
+    } else if (get_addr("wlan0",theip) == 0) {
+      if (strlen(theip) < 13) {
+         prints(module, "WiFi:");
+      }
+      prints(module, theip);
     } else {
       prints(module, "IP unknown!");
     }
@@ -224,7 +229,7 @@ static int get_addr(char * ifname,ip_address theip) {
   strncpy(ifrr.ifr_name, ifname, sizeof(ifrr.ifr_name));
 
   if (ioctl(sockfd, SIOCGIFADDR, ifr) < 0) {
-    printf("No %s interface.\n", ifname);
+    // printf("No %s interface.\n", ifname);
     close(sockfd);
     return -1;
   }
